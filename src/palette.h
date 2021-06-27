@@ -15,10 +15,10 @@ PONG typedef struct Palette_t {
 
 } Palette_t;
 
-PONG Palette_t *createPalette(Vector3, Vector3, bool);
-PONG void updatePalette(Palette_t *const);
-PONG void drawPalette(const Palette_t *const);
-PONG void deletePalette(Palette_t **);
+PONG Palette_t *createPalette(Vector3 position, Vector3 size, bool isMachine);
+PONG void updatePalette(Palette_t *const palette, const Vector3 ballPosition);
+PONG void drawPalette(const Palette_t *const palette);
+PONG void deletePalette(Palette_t **ptrPalette);
 
 #if defined(__cplusplus)
 }

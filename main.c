@@ -1,5 +1,6 @@
 #include "config.h"
 #include "src/palette.h"
+#include "src/ball.h"
 
 void DraRectGrid(int width, int height, float spacing);
 
@@ -45,6 +46,14 @@ int main(void)
     return 1;
   };
 
+  Ball_t *ball = createBall();
+  if (!ball) {
+    deletePalette(&player);
+    deletePalette(&enemy);
+    CloseWindow();
+    return 1;
+  }
+
   SetTargetFPS(FPS);
   while (!WindowShouldClose())
   {
@@ -66,14 +75,18 @@ int main(void)
         isPerspective = true;
       }
     }
+    // Update all objects.
+    updatePalette(player, ball->position);
+    updatePalette(enemy, ball->position);
+    updateBall(ball, player, enemy);
 
-    updatePalette(player);
-    updatePalette(enemy);
     BeginDrawing();
     ClearBackground(BLACK);
       BeginMode3D(camera);
+        // draw objects.
         drawPalette(player);
         drawPalette(enemy);
+        drawBall(ball);
         DraRectGrid(GRID_WIDTH, GRID_HEIGHT, 1.0f);
 
       EndMode3D();
@@ -82,6 +95,7 @@ int main(void)
   }
   deletePalette(&player);
   deletePalette(&enemy);
+  deleteBall(&ball);
   CloseWindow();
 
   return 0;

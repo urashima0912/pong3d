@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 PONG void __updateUser(Palette_t *const);
-PONG void __updateMachine(Palette_t *const);
+PONG void __updateMachine(Palette_t *const, const Vector3 ballPosition);
 
 #if defined(__cplusplus)
 }
@@ -44,9 +44,9 @@ PONG Palette_t *createPalette(Vector3 position, Vector3 size, bool isMachine)
 
   return palette;
 }
-PONG void updatePalette(Palette_t *const palette)
+PONG void updatePalette(Palette_t *const palette, const Vector3 ballPosition)
 {
-  if (palette->isMachine) __updateMachine(palette);
+  if (palette->isMachine) __updateMachine(palette, ballPosition);
   else __updateUser(palette);
 }
 PONG void drawPalette(const Palette_t *const palette)
@@ -72,7 +72,7 @@ PONG void deletePalette(Palette_t **ptrPalette)
     (*ptrPalette) = NULL;
 
     #if defined(PONG_DEBUG)
-      TraceLog(LOG_INFO, "The Palette_t has be deleted:");
+      TraceLog(LOG_INFO, "The Palette_t has been deleted:");
     #endif
   } 
 }
@@ -85,13 +85,22 @@ PONG void __updateUser(Palette_t *const palette)
 {
   const Vector3 position = palette->position;
   const int32_t limit = (GRID_HEIGHT / 2) - 2;
-  if (position.z > -limit && IsKeyPressed(KEY_W)) {
-    palette->position.z -= 1;
-  } else if (position.z <= limit && IsKeyPressed(KEY_S)) {
-    palette->position.z += 1;
+  if (position.z > -(limit + 0.5) && IsKeyDown(KEY_W)) {
+    palette->position.z -= 0.5;
+  } else if (position.z <= limit && IsKeyDown(KEY_S)) {
+    palette->position.z += 0.5;
   }
 }
-PONG void __updateMachine(Palette_t *const palette)
+PONG void __updateMachine(Palette_t *const palette, const Vector3 ballPosition)
 {
-  // TODO.
+  const float diff = palette->size.z/2;
+  const float speed = 0.5;
+  const float heightDiff = GRID_HEIGHT / 2;
+  const float upSide = palette->position.z + diff;
+  const float downSide = palette->position.z - diff;
+
+  if (upSide - 1 < ballPosition.z && upSide < heightDiff)
+    palette->position.z += speed;
+  else if (downSide + 2 > ballPosition.z && downSide > -heightDiff)
+    palette->position.z -= speed;
 }
